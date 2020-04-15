@@ -10,10 +10,15 @@ export default class App extends Component {
       productos: [],
       newsletters: [],
       categorias: [],
-      ultimoProducto: {}
+      ultimoProducto: {},
+      cantidadTotal: 0,
+      selectedItem: this.selectedItem
     }
+
+    this.handleClick = this.handleClick.bind(this);
   }
   baseUrl = `http://localhost:3000/api`;
+  selectedItem = []
 
   componentDidMount() {
     const usuarios = () => {
@@ -63,9 +68,22 @@ export default class App extends Component {
             categorias: responses[4]
           });
 
+          // Obtener el total
+          this.obtenerTotal();
+
           // Al final, obtener el ultimo
           this.obtenerUltimoProducto();
         })
+  }
+
+  obtenerTotal() {
+    const productos = this.state.productos;
+    let cantidadTotal = 0;
+    productos.forEach(producto => {
+      return cantidadTotal += producto.precio;
+    })
+
+    this.setState({cantidadTotal});
   }
 
   obtenerUltimoProducto() {
@@ -73,6 +91,11 @@ export default class App extends Component {
       return this.state.productos.indexOf(producto) === this.state.productos.length - 1;
     })
     this.setState({ultimoProducto: ultimoProducto[0]});
+  }
+
+  handleClick(e) {
+    this.selectedItem[0] = e.target.id;
+    this.setState({selectedItem: this.selectedItem});
   }
 
   render() {
@@ -218,9 +241,7 @@ export default class App extends Component {
                             <div className="text-xs font-weight-bold text-success text-uppercase mb-1"> Amount in
                               products
                             </div>
-                            <div className="h5 mb-0 font-weight-bold text-gray-800">{this.state.productos.reduce((total, acum) => {
-                              return `$${total + acum.precio}`;
-                            }, 0)}</div>
+                            <div className="h5 mb-0 font-weight-bold text-gray-800">{`$${this.state.cantidadTotal}.00`}</div>
                           </div>
                           <div className="col-auto">
                             <i className="fas fa-dollar-sign fa-2x text-gray-300"></i>
@@ -296,9 +317,9 @@ export default class App extends Component {
                         <div className="row">
                           {this.state.categorias.map(categoria => {
                             return (
-                                <div className="col-lg-6 mb-4" key={categoria.id}>
+                                <div className="col-lg-6 mb-4 categoria" key={categoria.id} onClick={this.handleClick}>
                                   <div className="card bg-info text-white shadow">
-                                    <div className="card-body">
+                                    <div className={`card-body ${parseInt(this.state.selectedItem[0]) === categoria.id ? 'selected' : ''}`} id={categoria.id}>
                                       {categoria.nombre}
                                     </div>
                                   </div>
@@ -338,7 +359,7 @@ export default class App extends Component {
                                 <td>
                                   {producto.categoriaId}
                                 </td>
-                                <td>pendiente</td>
+                                <td>{producto.cantidad}</td>
                               </tr>
                           )
                         })}
