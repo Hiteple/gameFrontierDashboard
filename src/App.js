@@ -8,7 +8,8 @@ export default class App extends Component {
       usuarios: [],
       admins: [],
       productos: [],
-      newsletters: []
+      newsletters: [],
+      ultimoProducto: {}
     }
   }
   baseUrl = `http://localhost:3000/api`;
@@ -45,13 +46,20 @@ export default class App extends Component {
 
     Promise.all([usuarios(), admins(), productos(), newsletters()])
         .then(responses => {
+          console.log(responses)
           this.setState({
             usuarios: responses[0],
             admins: responses[1],
             productos: responses[2],
             newsletters: responses[3],
-          })
+          });
+
+          this.obtenerUltimoProducto();
         })
+  }
+
+  obtenerUltimoProducto() {
+    this.setState({ultimoProducto: this.state.productos.pop()});
   }
 
   render() {
@@ -169,9 +177,8 @@ export default class App extends Component {
 
                 {/*<!-- Content Row -->*/}
                 <div className="row">
-
                   {/*<!-- Amount of Products in DB -->*/}
-                  <div className="col-md-4 mb-4">
+                  <div className="col-md-3 mb-4">
                     <div className="card border-left-primary shadow h-100 py-2">
                       <div className="card-body">
                         <div className="row no-gutters align-items-center">
@@ -179,7 +186,7 @@ export default class App extends Component {
                             <div className="text-xs font-weight-bold text-primary text-uppercase mb-1"> Products in Data
                               Base
                             </div>
-                            <div className="h5 mb-0 font-weight-bold text-gray-800">135</div>
+                            <div className="h5 mb-0 font-weight-bold text-gray-800">{this.state.productos.length}</div>
                           </div>
                           <div className="col-auto">
                             <i className="fas fa-clipboard-list fa-2x text-gray-300"></i>
@@ -190,7 +197,7 @@ export default class App extends Component {
                   </div>
 
                   {/*<!-- $$$ of all products in DB -->*/}
-                  <div className="col-md-4 mb-4">
+                  <div className="col-md-3 mb-4">
                     <div className="card border-left-success shadow h-100 py-2">
                       <div className="card-body">
                         <div className="row no-gutters align-items-center">
@@ -198,7 +205,9 @@ export default class App extends Component {
                             <div className="text-xs font-weight-bold text-success text-uppercase mb-1"> Amount in
                               products
                             </div>
-                            <div className="h5 mb-0 font-weight-bold text-gray-800">$546.456</div>
+                            <div className="h5 mb-0 font-weight-bold text-gray-800">{this.state.productos.reduce((total, acum) => {
+                              return `$${total + acum.precio}`;
+                            }, 0)}</div>
                           </div>
                           <div className="col-auto">
                             <i className="fas fa-dollar-sign fa-2x text-gray-300"></i>
@@ -209,14 +218,32 @@ export default class App extends Component {
                   </div>
 
                   {/*<!-- Amount of users in DB -->*/}
-                  <div className="col-md-4 mb-4">
+                  <div className="col-md-3 mb-4">
                     <div className="card border-left-warning shadow h-100 py-2">
                       <div className="card-body">
                         <div className="row no-gutters align-items-center">
                           <div className="col mr-2">
                             <div className="text-xs font-weight-bold text-warning text-uppercase mb-1">Users quantity
                             </div>
-                            <div className="h5 mb-0 font-weight-bold text-gray-800">38</div>
+                            <div className="h5 mb-0 font-weight-bold text-gray-800">{this.state.usuarios.length}</div>
+                          </div>
+                          <div className="col-auto">
+                            <i className="fas fa-user-check fa-2x text-gray-300"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Amount of admins in DB */}
+                  <div className="col-md-3 mb-4">
+                    <div className="card border-left-primary shadow h-100 py-2">
+                      <div className="card-body">
+                        <div className="row no-gutters align-items-center">
+                          <div className="col mr-2">
+                            <div className="text-xs font-weight-bold text-primary text-uppercase mb-1">Admins quantity
+                            </div>
+                            <div className="h5 mb-0 font-weight-bold text-gray-800">{this.state.admins.length}</div>
                           </div>
                           <div className="col-auto">
                             <i className="fas fa-user-check fa-2x text-gray-300"></i>
@@ -240,9 +267,7 @@ export default class App extends Component {
                           <img className="img-fluid px-3 px-sm-4 mt-3 mb-4" style={{width: '25rem'}}
                                src="assets/images/product_dummy.svg" alt="Dummy logo" />
                         </div>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolores, consequatur explicabo officia
-                          inventore libero veritatis iure voluptate reiciendis a magnam, vitae, aperiam voluptatum non
-                          corporis quae dolorem culpa exercitationem ratione?</p>
+                        {this.state.ultimoProducto && <p>{this.state.ultimoProducto.descripcion}</p>}
                         <a target="_blank" rel="nofollow" href="/">View product detail</a>
                       </div>
                     </div>
