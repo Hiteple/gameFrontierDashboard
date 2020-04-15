@@ -9,6 +9,7 @@ export default class App extends Component {
       admins: [],
       productos: [],
       newsletters: [],
+      categorias: [],
       ultimoProducto: {}
     }
   }
@@ -43,8 +44,15 @@ export default class App extends Component {
             .then(data => resolve(data))
       })
     }
+    const categorias = () => {
+      return new Promise((resolve, reject) => {
+        fetch(`${this.baseUrl}/categorias`)
+            .then(response => response.json())
+            .then(data => resolve(data))
+      })
+    }
 
-    Promise.all([usuarios(), admins(), productos(), newsletters()])
+    Promise.all([usuarios(), admins(), productos(), newsletters(), categorias()])
         .then(responses => {
           console.log(responses)
           this.setState({
@@ -52,14 +60,19 @@ export default class App extends Component {
             admins: responses[1],
             productos: responses[2],
             newsletters: responses[3],
+            categorias: responses[4]
           });
 
+          // Al final, obtener el ultimo
           this.obtenerUltimoProducto();
         })
   }
 
   obtenerUltimoProducto() {
-    this.setState({ultimoProducto: this.state.productos.pop()});
+    const ultimoProducto = this.state.productos.filter(producto => {
+      return this.state.productos.indexOf(producto) === this.state.productos.length - 1;
+    })
+    this.setState({ultimoProducto: ultimoProducto[0]});
   }
 
   render() {
@@ -281,48 +294,17 @@ export default class App extends Component {
                       </div>
                       <div className="card-body">
                         <div className="row">
-                          <div className="col-lg-6 mb-4">
-                            <div className="card bg-info text-white shadow">
-                              <div className="card-body">
-                                Category 01
-                              </div>
-                            </div>
-                          </div>
-                          <div className="col-lg-6 mb-4">
-                            <div className="card bg-info text-white shadow">
-                              <div className="card-body">
-                                Category 02
-                              </div>
-                            </div>
-                          </div>
-                          <div className="col-lg-6 mb-4">
-                            <div className="card bg-info text-white shadow">
-                              <div className="card-body">
-                                Category 03
-                              </div>
-                            </div>
-                          </div>
-                          <div className="col-lg-6 mb-4">
-                            <div className="card bg-info text-white shadow">
-                              <div className="card-body">
-                                Category 04
-                              </div>
-                            </div>
-                          </div>
-                          <div className="col-lg-6 mb-4">
-                            <div className="card bg-info text-white shadow">
-                              <div className="card-body">
-                                Category 05
-                              </div>
-                            </div>
-                          </div>
-                          <div className="col-lg-6 mb-4">
-                            <div className="card bg-info text-white shadow">
-                              <div className="card-body">
-                                Category 06
-                              </div>
-                            </div>
-                          </div>
+                          {this.state.categorias.map(categoria => {
+                            return (
+                                <div className="col-lg-6 mb-4" key={categoria.id}>
+                                  <div className="card bg-info text-white shadow">
+                                    <div className="card-body">
+                                      {categoria.nombre}
+                                    </div>
+                                  </div>
+                                </div>
+                            )
+                          })}
                         </div>
                       </div>
                     </div>
@@ -343,61 +325,23 @@ export default class App extends Component {
                           <th>Description</th>
                           <th>Price</th>
                           <th>Categories</th>
-                          <th>Colors</th>
                           <th>Stock</th>
                         </tr>
                         </thead>
-                        <tfoot>
-                        <tr>
-                          <th>Name</th>
-                          <th>Description</th>
-                          <th>Price</th>
-                          <th>Categories</th>
-                          <th>Colors</th>
-                          <th>Stock</th>
-                        </tr>
-                        </tfoot>
                         <tbody>
-                        <tr>
-                          <td>Tiger Nixon</td>
-                          <td>System Architect</td>
-                          <td>$320,800</td>
-                          <td>
-                            <ul>
-                              <li>Category 01</li>
-                              <li>Category 02</li>
-                              <li>Category 03</li>
-                            </ul>
-                          </td>
-                          <td>
-                            <ul>
-                              <li><span className="text-danger">Red</span></li>
-                              <li><span className="text-primary">Blue</span></li>
-                              <li><span className="text-success">Green</span></li>
-                            </ul>
-                          </td>
-                          <td>245</td>
-                        </tr>
-                        <tr>
-                          <td>Jane Doe</td>
-                          <td>Fullstack developer</td>
-                          <td>$320,800</td>
-                          <td>
-                            <ul>
-                              <li>Category 01</li>
-                              <li>Category 02</li>
-                              <li>Category 03</li>
-                            </ul>
-                          </td>
-                          <td>
-                            <ul>
-                              <li><span className="text-danger">Red</span></li>
-                              <li><span className="text-primary">Blue</span></li>
-                              <li><span className="text-success">Green</span></li>
-                            </ul>
-                          </td>
-                          <td>245</td>
-                        </tr>
+                        {this.state.productos.map(producto => {
+                          return(
+                              <tr key={producto.id}>
+                                <td>{producto.nombre}</td>
+                                <td>{producto.descripcion}</td>
+                                <td>${producto.precio}</td>
+                                <td>
+                                  {producto.categoriaId}
+                                </td>
+                                <td>pendiente</td>
+                              </tr>
+                          )
+                        })}
                         </tbody>
                       </table>
                     </div>
