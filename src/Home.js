@@ -24,7 +24,13 @@ class Home extends Component {
     componentDidMount() {
         const usuarios = () => {
             return new Promise((resolve, reject) => {
-                fetch(`${this.baseUrl}/usuarios`)
+                fetch(`${this.baseUrl}/usuarios`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                })
                     .then(response => response.json())
                     .then(data => resolve(data))
             })
@@ -38,7 +44,13 @@ class Home extends Component {
         }
         const productos = () => {
             return new Promise((resolve, reject) => {
-                fetch(`${this.baseUrl}/productos`)
+                fetch(`${this.baseUrl}/productos`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                })
                     .then(response => response.json())
                     .then(data => resolve(data))
             })
@@ -74,6 +86,8 @@ class Home extends Component {
 
                 // Al final, obtener el ultimo
                 this.obtenerUltimoProducto();
+
+                console.log(this.state.productos[0].imagen);
             })
     }
 
@@ -301,9 +315,15 @@ class Home extends Component {
                                         <div className="card-body">
                                             <div className="text-center">
                                                 <img className="img-fluid px-3 px-sm-4 mt-3 mb-4" style={{width: '25rem'}}
-                                                     src="assets/images/product_dummy.svg" alt="Dummy logo" />
+                                                     src="assets/images/product_dummy.svg" alt={this.state.ultimoProducto} />
                                             </div>
-                                            {this.state.ultimoProducto && <p>{this.state.ultimoProducto.descripcion}</p>}
+                                            {this.state.ultimoProducto && (
+                                                <>
+                                                    <p>{this.state.ultimoProducto.nombre}</p>
+                                                    <p>{this.state.ultimoProducto.descripcion}</p>
+                                                    <p>{`$${this.state.ultimoProducto.precio}.00`}</p>
+                                                </>
+                                            )}
                                             <a target="_blank" rel="nofollow" href="/">View product detail</a>
                                         </div>
                                     </div>
